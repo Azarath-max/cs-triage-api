@@ -126,6 +126,38 @@ ruff check .
 
 No network, no database, no API key. The suite covers validation edge cases, every health rule, every routing branch, the Gemini request/response handling via `httpx.MockTransport`, and the HTTP layer end to end.
 
+## Deploying it
+
+The image is self-contained and reads the `PORT` environment variable, so it runs on any Docker host. The repository ships a `render.yaml` blueprint for Render's free tier.
+
+### Render
+
+1. In the Render Dashboard, choose **New → Blueprint** and select this repository.
+2. Click **Apply**. Render builds the Dockerfile and serves it at `https://<service-name>.onrender.com`.
+
+`render.yaml` sets one variable, `REPOSITORY=memory`. There is no API key and no webhook secret, so the deployment runs the deterministic classifier against the three in-memory demo customers and `/docs` works for anyone who visits. That is deliberate: a demo nobody can call is not a demo.
+
+Free-plan behaviour worth knowing:
+
+- The service spins down after 15 minutes with no traffic and takes about a minute to wake up. The first visitor after a quiet period waits.
+- 750 instance hours per month, 0.1 CPU / 512 MB RAM.
+- The filesystem is ephemeral, so in-memory state resets on every restart.
+
+To use the real model, add `GEMINI_API_KEY` under the service's Environment tab. If you also set `WEBHOOK_SECRET`, every request needs an `X-Webhook-Secret` header, which breaks "Try it out" in `/docs` — leave it empty for a public demo and set it only when the endpoint is called by another service you control.
+
+### Any other Docker host
+
+```bash
+docker build -t cs-triage-api .
+docker run -p 8000:8000 cs-triage-api
+```
+
+Override the listening port the way a platform would:
+
+```bash
+docker run -p 10000:10000 -e PORT=10000 cs-triage-api
+```
+
 ## Configuration
 
 | Variable | Default | Purpose |

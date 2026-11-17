@@ -1,0 +1,24 @@
+# Render Blueprint: one-click deploy of the API as a free Docker web service.
+# In the Render Dashboard choose New -> Blueprint, point it at this repo, apply.
+#
+# Deliberately runs with no secrets:
+#   REPOSITORY=memory    -> the in-memory repository and its demo customers
+#   no GEMINI_API_KEY    -> the deterministic classifier, no paid calls
+#   no WEBHOOK_SECRET    -> visitors can use "Try it out" in /docs
+#
+# Add GEMINI_API_KEY in the dashboard later if you want the real model. If you
+# do, the free tier makes outbound calls from a shared IP, so keep the key
+# restricted to the Gemini API only.
+
+services:
+  - type: web
+    name: cs-triage-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: REPOSITORY
+        value: memory
