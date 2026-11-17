@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.responses import RedirectResponse
 
 from app.classifier import Classifier, build_classifier
 from app.config import Settings, get_settings
@@ -71,6 +72,12 @@ def verify_webhook_secret(request: Request) -> None:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="invalid webhook secret",
         )
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    """A bare visit to the service URL should land on something useful."""
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/health", tags=["ops"])

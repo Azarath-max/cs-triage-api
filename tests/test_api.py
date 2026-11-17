@@ -25,6 +25,13 @@ def test_health_endpoint_reports_mode(client):
     assert body["repository"] == "memory"
 
 
+def test_root_sends_visitors_to_the_docs(client):
+    response = client.get("/", follow_redirects=False)
+
+    assert response.status_code in {302, 307}
+    assert response.headers["location"] == "/docs"
+
+
 def test_valid_message_is_accepted_and_routed(client):
     response = client.post("/v1/messages", json=make_message())
 
