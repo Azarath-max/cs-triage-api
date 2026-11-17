@@ -1,5 +1,7 @@
 # CS Triage API
 
+**Live:** <https://cs-triage-api.onrender.com/docs> · **Health:** <https://cs-triage-api.onrender.com/health>
+
 A customer support triage API built around one rule: **the model classifies, plain code decides.**
 
 An inbound message is validated, classified by an LLM against a schema, re-validated in code, scored against deterministic account-health rules, and routed to a queue with an explicit response mode. Risky or uncertain cases are held for a human before anything is sent.
